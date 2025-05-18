@@ -1,15 +1,34 @@
-// app/memories/page.tsx oder pages/memories.tsx
+"use client";
+
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-export default async function MemoriesPage() {
-  const { data: memories, error } = await supabase
-    .from("memories")
-    .select("*")
-    .order("created_at", { ascending: false });
+export default function MemoriesPage() {
+  const [memories, setMemories] = useState<Memory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  console.log(memories);
+  useEffect(() => {
+    const fetchMemories = async () => {
+      const { data, error } = await supabase
+        .from("memories")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-  if (error) return <div>Fehler beim Laden: {error.message}</div>;
+      if (error) {
+        setError(error.message);
+      } else {
+        setMemories(data || []);
+      }
+
+      setLoading(false);
+    };
+
+    fetchMemories();
+  }, []);
+
+  if (loading) return <p>Lade Erinnerungen…</p>;
+  if (error) return <p>Fehler: {error}</p>;
 
   return (
     <div>
@@ -27,3 +46,10 @@ export default async function MemoriesPage() {
     </div>
   );
 }
+
+type Memory = {
+  id: number;
+  created_at: string;
+  text: string;
+  qdrant_id: string;
+};

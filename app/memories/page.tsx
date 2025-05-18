@@ -15,7 +15,7 @@ export default async function MemoriesPage() {
     <div>
       <h1>Memories</h1>
       <ul>
-        {memories.map((m: any) => (
+        {memories.map((m) => (
           <li key={m.id}>
             <p>
               <strong>{new Date(m.created_at).toLocaleString()}</strong>
